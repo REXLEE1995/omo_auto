@@ -4,7 +4,6 @@ import requests
 import time
 from public_mods.login_b_c import Environment
 from public_mods.Common_method import Common
-from public_mods.send_email import send_email
 
 
 class Order(Environment):
@@ -46,25 +45,26 @@ class Order(Environment):
                 print("确认收货异常，请排查...\n",e)
 
     #从登录时存储的token文件里获取B端用户token
-    def get_token(self):
+    def get_token1(self):
         path=self.get_path()
         with open(path, "r") as f:
             txt=f.read()
             txt=txt.split(':')[1]
+            print(txt)
             return txt
     #获取B端用户token方法2
-    def get_tkoen1(self,path):
+    def get_token(self,path):
         try:
             if "env_config_omo" in path:
-                 with open("userdata/内部测试0043/无一店铺D/accessToken.txt", "r") as f:
+                 with open("../userdata/内部测试0043/无一店铺D/accessToken.txt", "r") as f:
                     txt=f.read()
                     txt=txt.split(':')[1]
             elif "env_config_pre" in path:
-                 with open("userdata/内部测试0025/预发固定店铺二组1/accessToken.txt", "r") as f:
+                 with open("../userdata/内部测试0025/预发固定店铺二组1/accessToken.txt", "r") as f:
                     txt=f.read()
                     txt=txt.split(':')[1]
             else:
-                 with open("userdata/admin-mdl/麦当劳222店/accessToken.txt", "r") as f:
+                 with open("../userdata/admin-mdl/麦当劳222店/accessToken.txt", "r") as f:
                     txt=f.read()
                     txt=txt.split(':')[1]
             return txt
@@ -91,10 +91,11 @@ class Order(Environment):
                     "Connection":"keep-alive",
                     "Content-Type":"application/json;charset=UTF-8"}
             res = requests.post(url=url, headers=header, json=data)
+
             return res.text
         except Exception as e:
             print("发货异常:",e)
-            # send_email(e)
+
 
 
 
@@ -122,14 +123,15 @@ if __name__ == '__main__':
     order_code= env.go_shop(goods_url)   #购物下单,获取订单号
     # 发货
     if success==True:
-        token=env.get_token()
-        delivery_code=env.delivery(order_code, token,data)
-        if "success" == json.loads(delivery_code)["status"]:
-            print("发货成功")
-            time.sleep(2)
-            env.take_goods()   #确认收货
-        else:
-            print("发货失败")
+        if len(order_code)>0:
+            token=env.get_token(config_file)
+            delivery_code=env.delivery(order_code, token,data)
+            if "success" == json.loads(delivery_code)["status"]:
+                print("发货成功")
+                time.sleep(2)
+                env.take_goods()   #确认收货
+            else:
+                print("发货失败")
 
     else:
         print("B端账号登录失败")

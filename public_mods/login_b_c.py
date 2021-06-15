@@ -1,3 +1,5 @@
+import json
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pickle
@@ -10,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from public_mods.LocalStorage import LocalStorage
 from public_mods.Common_method import *
+from public_mods.SessionStorage import SessionStorage
 
 
 class Environment(Common):
@@ -149,30 +152,30 @@ class Environment(Common):
 
     # 保存浏览器缓存信息
     def save_storage(self):
-        if os.path.exists("userdata/" + self.username + "/" + self.shopname + "/"):
+        if os.path.exists("../userdata/" + self.username + "/" + self.shopname + "/"):
             pass
         else:
-            os.makedirs("userdata/" + self.username + "/" + self.shopname + "/")
+            os.makedirs("../userdata/" + self.username + "/" + self.shopname + "/")
         storage = LocalStorage(self.driver)
         userInfo = (storage["userInfo"])
         pickle.dump(userInfo, open(
-            "userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_userInfo.pickle", "wb"))
+            "../userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_userInfo.pickle", "wb"))
         shopInfos = (storage["shopInfos"])
         pickle.dump(shopInfos, open(
-            "userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_shopInfos.pickle", "wb"))
+            "../userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_shopInfos.pickle", "wb"))
 
     # 保存cookies
     def save_cookie(self):
-        if os.path.exists("userdata/" + self.username + "/" + self.shopname + "/"):
+        if os.path.exists("../userdata/" + self.username + "/" + self.shopname + "/"):
             pass
         else:
-            os.makedirs("userdata/" + self.username + "/" + self.shopname + "/")
+            os.makedirs("../userdata/" + self.username + "/" + self.shopname + "/")
         # 将cookie序列化保存下来
         pickle.dump(self.driver.get_cookies(), open(
-            "userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_cookies.pickle", "wb"))
+            "../userdata/" + self.username + "/" + self.shopname + "/" + str(self.username) + "_cookies.pickle", "wb"))
         for cookie in self.driver.get_cookies():
             if cookie['name'] == "authToken":
-                filename = "userdata/" + self.username + "/" + self.shopname + "/" + "/accessToken.txt"
+                filename = "../userdata/" + self.username + "/" + self.shopname + "/" + "/accessToken.txt"
                 with open(filename, 'w') as file_object:
                   file_object.write("accessToken:" + cookie['value'])
 
@@ -190,7 +193,7 @@ class Environment(Common):
             '//form[@class="form-data-wrap van-form"]/div[4]/div/div/input[@name="password"]').send_keys(password)
         time.sleep(1)
         self.driver2.find_element_by_xpath('//*[@id="app"]/div[1]/form/button').click()  # 登录
-        if self.is_long_c()==True:
+        if self.is_long_c(nickname)==True:
             return True
             #通过浏览器缓存用户信息判断是否登录成功
             # storage = SessionStorage(self.driver2)
@@ -200,18 +203,21 @@ class Environment(Common):
             #     self.driver2.get(goods)
 
     #判断是否c端登录成功
-    def is_long_c(self):
-        for i in range(10):
-            time.sleep(1)
-            try:
-                if self.driver2.find_element_by_xpath('//*[@id="mobileNav"]/nav/div[3]/a/div[2]').text=="购物车":
-                    print("C端登录成功")
-                    return True
+    def is_long_c(self,nickname):
+        for i in range(5):
+            time.sleep(2)
+            # try:
+            # 通过浏览器缓存用户信息判断是否登录成功
+            storage = SessionStorage(self.driver2)
+            storage=json.loads(storage["userInfo"])
+            if nickname == storage["value"]["nickName"]:
+                print("C端登录成功")
+                return True
 
-                else:
-                    print("C端登录检测次数：",i)
-            except Exception :
-              print("检查是否完成登录···")
+            else:
+                print("C端登录检测次数：",i+1)
+            # except Exception :
+            #   print("检查是否完成登录···")
 
         return False
 

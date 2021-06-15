@@ -23,8 +23,7 @@ class SessionStorage:
             "return keys; ")
 
     def get(self, key):
-        return self.driver.execute_script("return window.sessionStorage.getItem(arguments[0]);", key)
-
+            return self.driver.execute_script("return window.sessionStorage.getItem(arguments[0]);", key)
     def set(self, key, value):
         self.driver.execute_script("window.sessionStorage.setItem(arguments[0], arguments[1]);", key, value)
 
