@@ -108,11 +108,11 @@ from email.header import Header
 # SMTP服务器,这里使用企业邮箱
 mail_host = "smtp.300.cn"
 # 发件人邮箱
-mail_sender = "wuhaoyu@300.cn"
+mail_sender = "123@300.cn"
 # 邮箱授权码,注意这里不是邮箱密码,如何获取邮箱授权码,请看本文最后教程
-mail_license = "wuhaoyu@300"
+mail_license = "123@300"
 # 收件人邮箱，可以为多个收件人
-mail_receivers = ["1165951374@qq.com"]
+mail_receivers = ["123@qq.com"]
 
 mm = MIMEMultipart('related')
 
